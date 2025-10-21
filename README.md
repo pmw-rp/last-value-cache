@@ -37,7 +37,12 @@ source ./1-install-minio.sh
 
 ## Demo
 
-The demo is built using three scripts:
+The demo is built using multiple scripts:
+
+### Approach A (for topics where the readers and writers can use different topics)
+
+In this approach, the source topic is in tiered storage, which connects to the destination topic (not in tiered storage)
+via WASM.
 
 - The first script creates the topics required, configures them appropriately, configures the compaction to be
 demo-friendly and deploys the transform;
@@ -46,7 +51,27 @@ demo-friendly and deploys the transform;
 all the existing data 
 
 ```bash
-./3-create-topics.sh
-./4-usage.sh
-./5-recreate.sh
+./3a-create-topics.sh
+./4a-usage.sh
+./5a-recreate.sh
 ```
+
+### Approach B (for topics where the readers and writers need the same topic)
+
+The second approach shows a similar setup, but has a primary (non-TS) topic that serves all reads and writes, while a
+secondary (TS) topic acts as a backup. The backup is populated via WASM.
+
+On restore, we recreate the primary (non-TS) topic, use a reverse WASM transform, then once the restore is completed,
+replace that with a forward transform.
+
+There are a similar set of scripts:
+
+```bash
+./3b-create-topics.sh
+./4b-usage.sh
+./5b-recreate.sh
+```
+
+In practice, with Approach B it would be necessary to monitor the lag of the restore process using a metric such as
+`redpanda_transform_processor_lag`. Once this hits zero, the restore transform can be removed and replaced with a forward
+transform.
