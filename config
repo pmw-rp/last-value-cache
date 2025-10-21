@@ -1,0 +1,2 @@
+export MINIO_NAMESPACE=minio
+export REDPANDA_NAMESPACE=redpanda
