@@ -58,6 +58,12 @@ auth:
     enabled: false
 EOF
 
-rpk profile create rp -s brokers=redpanda.${REDPANDA_NAMESPACE}.svc.cluster.local:9093 -s admin.hosts=redpanda.${REDPANDA_NAMESPACE}.svc.cluster.local:9644 || rpk profile use rp
+if [ "$(kubectl get nodes | tail -1 | awk '{print $1}')" = "orbstack" ]; then
+    rpk profile create rp-bcced7fb -s brokers=redpanda.${REDPANDA_NAMESPACE}.svc.cluster.local:9093 -s admin.hosts=redpanda.${REDPANDA_NAMESPACE}.svc.cluster.local:9644 || rpk profile use rp-bcced7fb
+else
+    kubectl port-forward pod/redpanda-0 -n $REDPANDA_NAMESPACE 9094 9644 &
+    echo $! > port-forward.pid
+    rpk profile create local-bcced7fb -s brokers=localhost:9094 -s admin.hosts=localhost:9644 || rpk profile use local-bcced7fb
+fi
 
 popd 2> /dev/null
