@@ -25,11 +25,8 @@ export REDPANDA_NAMESPACE=redpanda
 To install Minio and Redpanda, run the setup scripts:
 
 ```bash
-# Be sure to use source when installing Minio, since the script publishes environment
-# variables used when installing Redpanda
-
 # Install Minio
-source ./1-install-minio.sh
+./1-install-minio.sh
 
 # Install Redpanda
 ./2-install-redpanda.sh

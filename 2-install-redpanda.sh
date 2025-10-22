@@ -2,6 +2,8 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 pushd $SCRIPT_DIR
 
 source ./config
+export MINIO_USER=$(cat minio-creds | grep access | cut -f2 -d'=')
+export MINIO_PASSWORD=$(cat minio-creds | grep secret | cut -f2 -d'=')
 
 cat << EOF | helm upgrade --install redpanda redpanda/redpanda \
   --version 25.1.1 \
