@@ -42,7 +42,11 @@ The demo is built using multiple scripts:
 ### Approach A (for topics where the readers and writers can use different topics)
 
 In this approach, the source topic is in tiered storage, which connects to the destination topic (not in tiered storage)
-via WASM.
+via WASM:
+
+![Approach A](./resources/approach-a.png)
+
+#### Implementation
 
 - The first script creates the topics required, configures them appropriately, configures the compaction to be
 demo-friendly and deploys the transform;
@@ -51,24 +55,41 @@ demo-friendly and deploys the transform;
 all the existing data 
 
 ```bash
+# Create and configure topics
 ./3a-create-topics.sh
+
+# Produce some messages and consume, demonstrating the topics and compaction
 ./4a-usage.sh
+
+# Drop the local topic and demonstrate reconstruction
 ./5a-recreate.sh
 ```
 
 ### Approach B (for topics where the readers and writers need the same topic)
 
 The second approach shows a similar setup, but has a primary (non-TS) topic that serves all reads and writes, while a
-secondary (TS) topic acts as a backup. The backup is populated via WASM.
+secondary (TS) topic acts as a backup. The backup is populated via WASM:
 
-On restore, we recreate the primary (non-TS) topic, use a reverse WASM transform, then once the restore is completed,
-replace that with a forward transform.
+![Approach B](./resources/approach-b.png)
+
+On restore, we recreate the primary (non-TS) topic and deploy a reverse WASM transform to repopulate:
+
+![Approach B Restore](./resources/approach-b-restore.png)
+
+Once the restore is completed, we revert the flow by deploying the original forward transform.
+
+#### Implementation
 
 There are a similar set of scripts:
 
 ```bash
+# Create and configure topics
 ./3b-create-topics.sh
+
+# Produce some messages and consume, demonstrating the topics and compaction
 ./4b-usage.sh
+
+# Drop the local topic and demonstrate reconstruction
 ./5b-recreate.sh
 ```
 
